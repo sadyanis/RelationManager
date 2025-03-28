@@ -1,5 +1,3 @@
-
-
 services:
   api:
     build: .
@@ -7,15 +5,13 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/mydb
+      - PYTHONPATH=/app  
     depends_on:
       - db
-      
-        
-
-      # - kafka
     volumes:
-      - ./app:/app/app  # Synchronisation du code
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload  
+      - ./app:/app 
+      
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   db:
     image: postgres:16
@@ -26,15 +22,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-       - postgres_data:/var/lib/postgresql/data  
-
-  # kafka:
-  #   image: bitnami/kafka:latest
-  #   environment:
-  #     - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-  #     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-  #   ports:
-  #     - "9092:9092"
+      - ./postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
