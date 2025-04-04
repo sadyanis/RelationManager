@@ -10,20 +10,22 @@ from sqlalchemy.orm import sessionmaker
 #SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 #Base = declarative_base()
 # Now
-DATABASE_URL = "postgresql+asyncpg://user:password@localhost:5432/mydb"
+DATABASE_URL = "postgresql://user:password@db:5432/mydb"
 
-engine = create_async_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+# engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# SessionLocal = sessionmaker(
+    # bind=engine,
+    # class_=AsyncSession,
+    # expire_on_commit=False,
+# )
 Base = declarative_base()
 
 # Fonction pour obtenir une session de base de données
-async def get_db():
+def get_db():
     db =  SessionLocal() #SessionLocal()
     try:
         yield db
     finally:
-      await db.close()
+        db.close()

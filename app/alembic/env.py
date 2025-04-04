@@ -3,10 +3,10 @@ import os
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-from models.userModel import User  # Assurez-vous d'importer vos modèles ici
-from models.matchModel import Match  # Assurez-vous d'importer vos modèles ici
-from models.feedbackModel import Feedback  # Assurez-vous d'importer vos modèles ici
-from models.userMusicStatModel import UserMusicStat  # Assurez-vous d'importer vos modèles ici
+from models.userModel import User  
+from models.matchModel import Match  
+from models.feedbackModel import Feedback  
+from models.userMusicStatModel import UserMusicStat  
 # Ajoute le dossier `app/` au chemin des modules Python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 

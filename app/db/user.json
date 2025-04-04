@@ -1,0 +1,28 @@
+[
+    {
+        "user_id": 1,
+        "is_certified": 1,
+        "is_active": 1,
+        "birthdate": "1995-06-15T00:00:00",
+        "gender": "Male",
+        "accepted_age_gap": 5,
+        "accepted_distance": 50,
+        "targeted_gender": "Female",
+        "favorite_musician": "Coldplay",
+        "favorite_music": "Fix You",
+        "favorite_musical_style": "Rock"
+    },
+    {
+        "user_id": 2,
+        "is_certified": 0,
+        "is_active": 1,
+        "birthdate": "1998-09-21T00:00:00",
+        "gender": "Female",
+        "accepted_age_gap": 3,
+        "accepted_distance": 30,
+        "targeted_gender": "Male",
+        "favorite_musician": "Adele",
+        "favorite_music": "Hello",
+        "favorite_musical_style": "Pop"
+    }
+]
