@@ -1,12 +1,13 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from models.enums import MatchStatusCode
 
 class MatchBase(BaseModel):
     user1_id : int
     user2_id : int
     match_compatiblity : int
-    status_code : int
+    status_code : MatchStatusCode
 
 class MatchCreate(MatchBase):
     pass

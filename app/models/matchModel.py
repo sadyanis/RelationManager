@@ -5,7 +5,7 @@ from database import Base
 class Match(Base):
     __tablename__ = "matche"
 
-    match_id= Column(Integer, primary_key=True, index=True)
+    match_id= Column(Integer, primary_key=True, index=True, autoincrement=True)
     user1_id = Column(Integer, nullable=False)
     user2_id = Column(Integer, nullable=False)
     match_compatiblity = Column(Integer, nullable=False)
