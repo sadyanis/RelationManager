@@ -9,8 +9,10 @@ class FeedbackBase(BaseModel):
     score_user1 : Optional[int]
     score_user2 : Optional[int]
 
-class FeedbackCreate(FeedbackBase):
-    pass
+class FeedbackCreate(BaseModel):
+    match_id : int
+    user_id : int
+    score : int
 
 class FeedbackResponse(FeedbackBase):
     created_at : datetime

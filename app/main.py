@@ -6,7 +6,12 @@ from matching import MusicMatchEngine
 from sqlalchemy.orm import Session
 from database import get_db, SessionLocal
 from kafka.kafka_consumer import consume_messages
+from kafka.kafka_producer import * 
+from schemas.feedback import FeedbackCreate
+from schemas.User import UserBase
+from models.userModel import User
 from routers import matches
+import services.relationService as relationService
 import os
 import asyncio
 
@@ -55,8 +60,8 @@ app.include_router(matches.router)
 @app.get("/")
 async def root():
     return {"message": "Hello there"}
-
-@app.post("/match")
+#match avec music taste
+@app.post("/match") # getMatchs
 async def match_users(user1: dict, user2: dict):
     if not hasattr(app.state, 'match_engine'):
         raise HTTPException(
@@ -64,6 +69,17 @@ async def match_users(user1: dict, user2: dict):
             detail="Service non prêt: moteur de matching non chargé"
         )
     result = await app.state.match_engine.calculate_compatibility(user1, user2)
+    return result
+#match without music taste
+@app.post("/matchwithoutmusic")
+async def match_users_without_music(user1: UserBase, user2: UserBase):
+    if not hasattr(app.state, 'match_engine'):
+        raise HTTPException(
+            status_code=503,
+            detail="Service non prêt: moteur de matching non chargé"
+        )
+   
+    result = await app.state.match_engine.calculate_compatibility_from_dicts(user1, user2)
     return result
 
 @app.get("/health")
@@ -113,7 +129,70 @@ async def get_potential_matches(
         results.append(result)
     
     return results
+@app.get("/Savematches/{user_id}")
+async def save_matches(
+    user_id: int, 
+    db: Session = Depends(get_db),
+    kafka_producer: AIOKafkaProducer = Depends(get_kafka_producer)
+):
+    if not hasattr(app.state, 'match_engine'):
+        raise HTTPException(
+            status_code=503,
+            detail="Service non prêt: moteur de matching non chargé"
+        )
+    return await relationService.getMatches(user_id, db, app.state.match_engine, kafka_producer)
+    
+@app.get("/getFeedback/{match_id}")
+async def get_feedback(
+    match_id: int, 
+    db: Session = Depends(get_db)
+):
+    if not hasattr(app.state, 'match_engine'):
+        raise HTTPException(
+            status_code=503,
+            detail="Service non prêt: moteur de matching non chargé"
+        )
+    feedback = await relationService.getFeedBack(match_id, db)
+    if not feedback:
+        raise HTTPException(
+            status_code=404,
+            detail="Feedback non trouvé"
+        )
+    return feedback
 
+@app.post("/changefeedback")
+async def change_feedback(feedback:FeedbackCreate, db: Session = Depends(get_db)):
+    if not hasattr(app.state, 'match_engine'):
+        raise HTTPException(
+            status_code=503,
+            detail="Service non prêt: moteur de matching non chargé"
+        )
+
+    feedback = await relationService.changeFeedback(feedback.match_id, feedback.user_id, feedback.score, db)
+    return feedback
+  
+@app.post("/updateUserInf")
+async def update_user_information(user: UserBase, db: Session = Depends(get_db)):
+    user1 = await relationService.updateUserInformation(user, db)
+    return user1
+
+@app.get("/match/delete/{match_id}")
+async def delete_match(
+    match_id: int, 
+    db: Session = Depends(get_db)
+):
+    if not hasattr(app.state, 'match_engine'):
+        raise HTTPException(
+            status_code=503,
+            detail="Service non prêt: moteur de matching non chargé"
+        )
+    match = await relationService.deleteMatch(match_id, db)
+    if not match:
+        raise HTTPException(
+            status_code=404,
+            detail="match non trouvé"
+        )
+    return match
 
 
 
