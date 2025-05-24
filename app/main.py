@@ -124,9 +124,13 @@ async def get_potential_matches(
     
     results = []
     for other_user_id in users_ids:
-        other_user = await app.state.match_engine.get_user_data(db, other_user_id)
-        result = await app.state.match_engine.calculate_compatibility(user, other_user)
-        results.append(result)
+        # ajouter une methode qui verifie si il existe deja un match entre les deux utilisateurs
+        # si oui, on ne fait pas le calcul de compatibilité
+        # sinon on le fait
+        if not relationService.checkMatchExists(user_id, other_user_id, db):
+            other_user = await app.state.match_engine.get_user_data(db, other_user_id)
+            result = await app.state.match_engine.calculate_compatibility(user, other_user)
+            results.append(result)
     
     return results
 @app.get("/Savematches/{user_id}")
