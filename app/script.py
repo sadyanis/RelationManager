@@ -1,17 +1,22 @@
 import random
+import asyncio
 from faker import Faker
 from sqlalchemy.orm import Session
-from database import SessionLocal  # À créer (voir explications)
+from database import SessionLocal, create_engine , sessionmaker  # 
 from models.userModel import User  
 from models.matchModel import Match  
 from models.feedbackModel import Feedback  
 from models.userMusicStatModel import UserMusicStat  
 
+# DATABASE_URL = "postgresql://my_user:my_password@localhost:5432/my_database"  # note: version sync ici
+# engine = create_engine(DATABASE_URL)
+# SessionLocal = sessionmaker(bind=engine)
+
 fake = Faker()
 
-def seed_users(n=10):
+async def seed_users(n=10):
     """Insère des utilisateurs fictifs (version synchrone)"""
-    with SessionLocal() as db:
+    async with SessionLocal() as db:
         users = [
             User(
                 user_id=i + 1,
@@ -29,11 +34,11 @@ def seed_users(n=10):
             for i in range(n)
         ]
         db.add_all(users)
-        db.commit()
+        await db.commit()
 
-def seed_matches(n=5):
+async def seed_matches(n=5):
     """Insère des matchs fictifs (version synchrone)"""
-    with SessionLocal() as db:
+    async with SessionLocal() as db:
         matches = [
             Match(
                 match_id=i + 1,
@@ -45,11 +50,11 @@ def seed_matches(n=5):
             for i in range(n)
         ]
         db.add_all(matches)
-        db.commit()
+        await db.commit()
 
-def seed_feedback(n=5):
+async def seed_feedback(n=5):
     """Insère des feedbacks fictifs (version synchrone)"""
-    with SessionLocal() as db:
+    async with SessionLocal() as db:
         feedbacks = [
             Feedback(
                 match_id=i + 1,
@@ -61,11 +66,11 @@ def seed_feedback(n=5):
             for i in range(n)
         ]
         db.add_all(feedbacks)
-        db.commit()
+        await db.commit()
 
-def seed_user_music_stats(n=10):
+async def seed_user_music_stats(n=10):
     """Insère des statistiques musicales fictives (version synchrone)"""
-    with SessionLocal() as db:
+    async with SessionLocal() as db:
         music_stats = [
             UserMusicStat(
                 user_id=i + 1,
@@ -75,14 +80,14 @@ def seed_user_music_stats(n=10):
             for i in range(n)
         ]
         db.add_all(music_stats)
-        db.commit()
+        await db.commit()
 
-def main():
-    seed_users(10)
-    seed_matches(5)
-    seed_feedback(5)
-    seed_user_music_stats(10)
+async def main():
+    await seed_users(10)
+    await seed_matches(5)
+    await seed_feedback(5)
+    await seed_user_music_stats(10)
     print("Base de données peuplée avec succès !")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

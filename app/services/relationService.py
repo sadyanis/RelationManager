@@ -40,18 +40,6 @@ async def changeStatus(match: Match, user: User, hasMatch: bool, db: AsyncSessio
 
 async def saveMatch(match: Match, db: AsyncSession , kafka_producer: AIOKafkaProducer = None):
     """Enregistre un match dans la base de données"""
-    # d'abord verifier si ce match existe dans la base de données
-    existing_match = await db.execute(
-        select(Match).where(
-            (Match.user1_id == match.user1_id) & (Match.user2_id == match.user2_id)
-        )
-    )
-    existing_match = existing_match.scalars().first()
-    if existing_match:
-        # Si le match existe déjà, on le met à jour
-        
-        return existing_match
-    
     db.add(match)
     try:
         await db.commit()
@@ -177,15 +165,3 @@ async def deleteMatch(
     await db.commit()
     return match
     
-async def CheckExistingMatch(
-    user1_id: int,
-    user2_id: int,
-    db: AsyncSession
-) -> Match:
-    """Vérifie si un match existe déjà"""
-    match = await db.execute(
-        select(Match).where(
-            (Match.user1_id == user1_id) & (Match.user2_id == user2_id)
-        )
-    )
-    return True if match else False

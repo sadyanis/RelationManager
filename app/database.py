@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 #Base = declarative_base()
 # Now
 #DATABASE_URL = "postgresql://user:password@db:5432/mydb"
+SYNC_DATABASE_URL = "postgresql://my_user:my_password@localhost:5432/my_database"
 DATABASE_URL = "postgresql+asyncpg://my_user:my_password@localhost:5432/my_database"
 engine = create_async_engine(DATABASE_URL, echo=True)
 #engine = create_engine(DATABASE_URL)

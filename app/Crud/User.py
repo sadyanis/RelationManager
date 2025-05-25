@@ -1,8 +1,11 @@
 from models.userModel import User
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime
 import asyncio
 async def insert_user(db: AsyncSession, user_data: dict):
     """Insère un utilisateur dans la base de données."""
+    if isinstance(user_data.get("birthdate"), str):
+        user_data["birthdate"] = datetime.fromisoformat(user_data["birthdate"])
     user = User(
         user_id=user_data["user_id"],
         is_certified=user_data["is_certified"],
@@ -16,10 +19,15 @@ async def insert_user(db: AsyncSession, user_data: dict):
         favorite_music=user_data["favorite_music"],
         favorite_musical_style=user_data["favorite_musical_style"],
     )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return user
+    try:
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return user
+    except Exception as e:
+        await db.rollback()
+        print(f"Erreur lors de l'insertion de l'utilisateur: {e}")
+        return None
 
 async def delete_user(db: AsyncSession, user_id: int):
     """Supprime un utilisateur de la base de données."""
