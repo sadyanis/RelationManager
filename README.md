@@ -1,117 +1,94 @@
-# 🚀 Guide des Bonnes Pratiques Git & GitFlow
+#  Relation Manager - Music-Based Matchmaking Microservice
 
-## 📌 Branches principales
+Un microservice de calcul de compatibilité entre utilisateurs basé sur les goûts musicaux, développé avec FastAPI et containerisé avec Docker.
 
-### `main`
+##  Fonctionnalités
 
-- Contient le code **stable** en production.
-- Ne jamais pousser directement dessus.
-- Seules les **develop branche** et les **hotfixes** y sont mergées.
+- **Calcul de compatibilité** : Score de matching basé sur les préférences musicales
+- **API RESTful** : Interface complète pour la gestion des relations
+- **Authentication sécurisée** : Intégration Keycloak pour la protection des routes
+- **Communication asynchrone** : Utilisation de Kafka pour l'interconnexion des microservices
+- **Containerisation** : Déploiement Docker complet avec Docker Compose
+- **Hot-reload** : Développement avec rechargement automatique
 
-### `develop`
+##  Architecture Technique
 
-- Contient le dernier code **validé**.
-- Toutes les nouvelles fonctionnalités partent de `develop`.
+### Stack Technique
+- **Backend** : FastAPI (Python 3.11)
+- **Base de données** : PostgreSQL 16
+- **Authentication** : Keycloak
+- **Message Broker** : Apache Kafka
+- **Embeddings** : Sentence Transformers (all-mpnet-base-v2)
+- **Containerisation** : Docker & Docker Compose
+- **Serveur** : Uvicorn
 
----
+## 📋 API Endpoints
 
-## 🌱 Branches de développement
+### 🔐 Endpoints Authentifiés
+- `GET /` - Page d'accueil (Admin seulement)
+- `GET /health` - Statut du service (Admin seulement)
 
-### Feature branches (`feature/nom-feature`)
+### 🤝 Gestion des Matchs
+- `POST /match` - Calcul de compatibilité avec goûts musicaux
+- `POST /matchwithoutmusic` - Matching basique sans musique
+- `GET /matching/{user_id1}/{user_id2}` - Matching entre deux utilisateurs
+- `GET /matching/{user_id}` - Liste des matchs potentiels
+- `GET /Savematches/{user_id}` - Sauvegarde des matchs
 
-- Pour développer une **nouvelle fonctionnalité**.
-- Créée à partir de `develop`.
-- Merge **uniquement** dans `develop`.
-- Nom explicite (`feature/login-page` et non `feature/authentication`).
+###  Feedback & Gestion
+- `GET /getFeedback/{match_id}` - Récupération des feedbacks
+- `POST /changefeedback` - Modification des feedbacks
+- `POST /updateUserInf` - Mise à jour des informations utilisateur
+- `GET /match/delete/{match_id}` - Suppression d'un match
 
-#### 📌 Création d'une feature branch
+##  Installation & Déploiement
 
+### Prérequis
+- Docker
+- Docker Compose
+
+### Déploiement Rapide
+
+1. **Cloner le repository**
 ```bash
-# Se placer sur develop
-git checkout develop
-
-# Créer une nouvelle branche feature
-git checkout -b feature/login-page
+git clone <votre-repo>
+cd relation-manager
 ```
-
-#### 📌 Pousser une feature branch
-
+### Démarrage des services
 ```bash
-git push origin feature/login-page
+docker-compose up -d
 ```
-
-#### 📌 Fusionner une feature branch après validation
-
+### Vérification du déploiement
 ```bash
-git checkout develop
-git merge feature/login-page
-git push origin develop
+curl http://localhost:8000/health
 ```
-
-#### 📌 Merge de la develop dans `main`
-
+### Accès aux services
+- **API Relation Manager**:http://localhost:8000
+- **Documentation FastAPI** : http://localhost:8000/docs
+- **Base de données PostgreSQL** : localhost:5432
+- **Keycloak** : http://localhost:8080
+## Développement
+### Construction manuelle de l'image
 ```bash
-git checkout main
-git merge develop
-git push origin main
+docker build -t relation-manager .
 ```
-
-### Hotfix branches (`hotfix/x.y.z`)
-
-- Utilisée pour **corriger un bug urgent** en production.
-- Créée depuis `main`, merge dans `main` et `develop`.
-
-#### 📌 Création d’un hotfix
-
+### Exécution en mode développement
 ```bash
-git checkout main
-git checkout -b hotfix/1.0.1
+docker-compose up --build
 ```
+## Sécurité
+- **Keycloak** : Gestion centralisée des authentifications.
+- **Protection des routes**:  Middleware d'authentification via dépendances FastAPI.
+- **Validation des données**: Schémas Pydantic pour la validation des entrées
+## Algorithme de Matching
+Le système utilise un moteur de matching sophistiqué :
+1. **Embeddings musicaux** : Conversion des préférences musicales en vecteurs avec all-mpnet-base-v2
+2. **Similarité sémantique** : Calcul de similarité cosinus entre les embeddings
+3. **Facteurs multiples** : Combinaison avec d'autres critères de compatibilité
+4. **Score personnalisé** : Génération d'un pourcentage de matching
+## Auteurs
+**SADOUN YANIS** - Développeur Principal - @sadyanis
 
-#### 📌 Merge du hotfix
 
-```bash
-git checkout main
-git merge hotfix/1.0.1
-git push origin main
 
-git checkout develop
-git merge hotfix/1.0.1
-git push origin develop
-```
 
----
-
-## 🏷️ Gestion des Tags
-
-Les **tags** permettent d’identifier les versions stables.
-
-#### 📌 Création d’un tag versionné
-
-```bash
-git tag -a v1.0.0 -m "Release version 1.0.0"
-git push origin v1.0.0
-```
-
-#### 📌 Voir tous les tags
-
-```bash
-git tag
-```
-
-#### 📌 Supprimer un tag
-
-```bash
-git tag -d v1.0.0
-git push origin --delete v1.0.0
-```
-
----
-
-## 📝 Bonnes pratiques
-
-✅ Toujours travailler sur une **feature branch** et non sur `develop` ou `main`. ✅ Écrire des **messages de commit clairs**. ✅ Toujours **mettre à jour **`` avant de créer une nouvelle branche. ✅ Faire une **pull request** et demander une revue avant de merger. ✅ Supprimer une **feature branch** après le merge pour garder un repo propre.
-
----
-
-Avec cette méthodologie, nous assurons un workflow propre, structuré et efficace. 🚀🔥
